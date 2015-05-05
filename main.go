@@ -110,7 +110,7 @@ func main() {
 }
 
 func Combination(n int) [][]int {
-	var res = make([][]int, 0)
+	var res = make([][]int, 0, n*(n-1)/2)
 
 	for i := 0; i < n-1; i++ {
 		for j := i + 1; j < n; j++ {
