@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"strconv"
@@ -15,6 +16,10 @@ const (
 )
 
 func main() {
+	os.Exit(Solve(os.Stdin, os.Stdout))
+}
+
+func Solve(in io.Reader, out io.Writer) int {
 	s := minisat.NewSolver()
 	vars := make([][][]*minisat.Var, 0, N)
 	for i := 0; i < N; i++ {
@@ -72,7 +77,7 @@ func main() {
 	}
 
 	// scan
-	sc := bufio.NewScanner(os.Stdin)
+	sc := bufio.NewScanner(in)
 	sc.Split(bufio.ScanBytes)
 	for i := 0; i < N; i++ {
 		for j := 0; j < N; j++ {
@@ -88,25 +93,26 @@ func main() {
 	}
 	res := s.Solve()
 	if !res {
-		fmt.Println("Unsat")
-		os.Exit(1)
+		fmt.Fprintln(out, "Unsat")
+		return 1
 	}
 
-	out := make([]byte, 0, (N+1)*N)
+	o := make([]byte, 0, (N+1)*N)
 	for i := 0; i < N; i++ {
 		for j := 0; j < N; j++ {
 			for k := 0; k < N; k++ {
 				v := vars[i][j][k]
 				b, _ := s.ModelValue(v)
 				if b {
-					out = strconv.AppendInt(out, int64(k+1), 10)
+					o = strconv.AppendInt(o, int64(k+1), 10)
 					break
 				}
 			}
 		}
-		out = append(out, '\n')
+		o = append(o, '\n')
 	}
-	os.Stdout.Write(out)
+	out.Write(o)
+	return 0
 }
 
 func Combination(n int) [][]int {
