@@ -12,7 +12,8 @@ import (
 )
 
 const (
-	N = 9
+	N        = 9
+	Unfilled = -1
 )
 
 func main() {
@@ -77,20 +78,15 @@ func Solve(in io.Reader, out io.Writer) int {
 	}
 
 	// scan
-	sc := bufio.NewScanner(in)
-	sc.Split(bufio.ScanBytes)
-	for i := 0; i < N; i++ {
-		for j := 0; j < N; j++ {
-			sc.Scan()
-			t := sc.Text()
-			n, err := strconv.Atoi(t)
-			if err != nil || n == 0 {
-				continue
+	board := LoadBoard(in)
+	for i, row := range board {
+		for j, v := range row {
+			if v != Unfilled {
+				s.AddClause(vars[i][j][v])
 			}
-			s.AddClause(vars[i][j][n-1])
 		}
-		sc.Scan() // \n
 	}
+
 	res := s.Solve()
 	if !res {
 		fmt.Fprintln(out, "Unsat")
@@ -113,6 +109,31 @@ func Solve(in io.Reader, out io.Writer) int {
 	}
 	out.Write(o)
 	return 0
+}
+
+func LoadBoard(in io.Reader) [][]int {
+	res := make([][]int, N)
+	for i := 0; i < N; i++ {
+		res[i] = make([]int, N)
+	}
+
+	sc := bufio.NewScanner(in)
+	sc.Split(bufio.ScanBytes)
+	for i := 0; i < N; i++ {
+		for j := 0; j < N; j++ {
+			sc.Scan()
+			t := sc.Text()
+			n, err := strconv.Atoi(t)
+			if err != nil || n == 0 {
+				res[i][j] = Unfilled
+			} else {
+				res[i][j] = n - 1
+			}
+		}
+		sc.Scan() // \n
+	}
+
+	return res
 }
 
 func Combination(n int) [][]int {
