@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io"
 	"math"
+	"math/rand"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/pocke/go-minisat"
 )
@@ -17,11 +19,13 @@ const (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	os.Exit(Solve(os.Stdin, os.Stdout))
 }
 
 func Solve(in io.Reader, out io.Writer) int {
-	s := minisat.NewSolver()
+
+	s := minisat.NewSolver(rand.Float64())
 	vars := make([][][]*minisat.Var, 0, N)
 	for i := 0; i < N; i++ {
 		vars = append(vars, make([][]*minisat.Var, 0, N))
