@@ -13,6 +13,11 @@ const N = 9
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
+	if generateEnable() {
+		Gen()
+		return
+	}
+
 	board := sudoku.LoadBoard(os.Stdin, N)
 	result, err := sudoku.Solve(board, N, rand.Float64())
 	if err != nil {
@@ -28,9 +33,17 @@ func main() {
 		}
 	}
 
-	for _, row := range result {
+	PrintBoard(result)
+}
+
+func PrintBoard(board [][]int) {
+	for _, row := range board {
 		for _, v := range row {
-			fmt.Print(v + 1)
+			if v == sudoku.Unfilled {
+				fmt.Print(".")
+			} else {
+				fmt.Print(v + 1)
+			}
 		}
 		fmt.Println()
 	}
@@ -38,4 +51,17 @@ func main() {
 
 func checkUniqueEnable() bool {
 	return len(os.Args) > 1 && os.Args[1] == "check"
+}
+
+func generateEnable() bool {
+	return len(os.Args) > 1 && os.Args[1] == "gen"
+}
+
+func Gen() {
+	board, err := sudoku.Generate(N)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	PrintBoard(board)
 }
