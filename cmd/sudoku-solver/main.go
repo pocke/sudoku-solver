@@ -9,10 +9,12 @@ import (
 	sudoku "github.com/pocke/sudoku-solver"
 )
 
+const N = 9
+
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	board := sudoku.LoadBoard(os.Stdin)
-	result, err := sudoku.Solve(board)
+	board := sudoku.LoadBoard(os.Stdin, N)
+	result, err := sudoku.Solve(board, N)
 	if err != nil {
 		fmt.Fprintln(os.Stdout, err)
 		os.Exit(1)

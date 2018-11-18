@@ -12,11 +12,10 @@ import (
 )
 
 const (
-	N        = 9
 	Unfilled = -1
 )
 
-func Solve(board [][]int) ([][]int, error) {
+func Solve(board [][]int, N int) ([][]int, error) {
 	s := minisat.NewSolver(rand.Float64())
 	vars := make([][][]*minisat.Var, 0, N)
 	for i := 0; i < N; i++ {
@@ -104,7 +103,7 @@ func Solve(board [][]int) ([][]int, error) {
 	return result, nil
 }
 
-func LoadBoard(in io.Reader) [][]int {
+func LoadBoard(in io.Reader, N int) [][]int {
 	res := make([][]int, N)
 	for i := 0; i < N; i++ {
 		res[i] = make([]int, N)
