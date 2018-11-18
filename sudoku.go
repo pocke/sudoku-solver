@@ -107,6 +107,27 @@ func Solve(board [][]int, N int, seed float64) ([][]int, error) {
 	return result, nil
 }
 
+func CheckUnique(board, result [][]int, N int) bool {
+	s, vars := newSatSolver(N, 1)
+	for i, row := range board {
+		for j, v := range row {
+			if v != Unfilled {
+				s.AddClause(vars[i][j][v])
+			}
+		}
+	}
+
+	uniqChecker := make([]*minisat.Var, 0, N*N)
+	for i, row := range result {
+		for j, v := range row {
+			uniqChecker = append(uniqChecker, vars[i][j][v].Not())
+		}
+	}
+	s.AddClause(uniqChecker...)
+
+	return !s.Solve()
+}
+
 func LoadBoard(in io.Reader, N int) [][]int {
 	res := make([][]int, N)
 	for i := 0; i < N; i++ {
