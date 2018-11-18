@@ -14,7 +14,7 @@ const N = 9
 func main() {
 	rand.Seed(time.Now().UnixNano())
 	board := sudoku.LoadBoard(os.Stdin, N)
-	result, err := sudoku.Solve(board, N)
+	result, err := sudoku.Solve(board, N, rand.Float64())
 	if err != nil {
 		fmt.Fprintln(os.Stdout, err)
 		os.Exit(1)

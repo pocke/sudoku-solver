@@ -2,13 +2,17 @@ package sudoku_test
 
 import (
 	"bytes"
+	"math/rand"
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	sudoku "github.com/pocke/sudoku-solver"
 )
+
+const N = 9
 
 func TestSolve(t *testing.T) {
 	problem := `..4..5..1
@@ -32,8 +36,9 @@ func TestSolve(t *testing.T) {
 567981423
 `
 
-	board := sudoku.LoadBoard(strings.NewReader(problem))
-	result, err := sudoku.Solve(board)
+	board := sudoku.LoadBoard(strings.NewReader(problem), N)
+	rand.Seed(time.Now().UnixNano())
+	result, err := sudoku.Solve(board, N, rand.Float64())
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"io"
 	"math"
-	"math/rand"
 	"strconv"
 
 	"github.com/pkg/errors"
@@ -15,8 +14,8 @@ const (
 	Unfilled = -1
 )
 
-func Solve(board [][]int, N int) ([][]int, error) {
-	s := minisat.NewSolver(rand.Float64())
+func newSatSolver(N int, seed float64) (*minisat.Solver, [][][]*minisat.Var) {
+	s := minisat.NewSolver(seed)
 	vars := make([][][]*minisat.Var, 0, N)
 	for i := 0; i < N; i++ {
 		vars = append(vars, make([][]*minisat.Var, 0, N))
@@ -71,6 +70,11 @@ func Solve(board [][]int, N int) ([][]int, error) {
 			}
 		}
 	}
+	return s, vars
+}
+
+func Solve(board [][]int, N int, seed float64) ([][]int, error) {
+	s, vars := newSatSolver(N, seed)
 
 	for i, row := range board {
 		for j, v := range row {
