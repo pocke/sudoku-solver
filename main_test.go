@@ -1,10 +1,13 @@
-package main
+package sudoku_test
 
 import (
 	"bytes"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
+
+	sudoku "github.com/pocke/sudoku-solver"
 )
 
 func TestSolve(t *testing.T) {
@@ -29,10 +32,21 @@ func TestSolve(t *testing.T) {
 567981423
 `
 
+	board := sudoku.LoadBoard(strings.NewReader(problem))
+	result, err := sudoku.Solve(board)
+	if err != nil {
+		t.Fatal(err)
+	}
 	out := &bytes.Buffer{}
-	Solve(strings.NewReader(problem), out)
+	for _, row := range result {
+		for _, v := range row {
+			s := strconv.Itoa(v + 1)
+			out.WriteString(s)
+		}
+		out.WriteString("\n")
+	}
 	if out.String() != expected {
-		t.Error("Invalid sudoku")
+		t.Errorf("Invalid sudoku, expected: %s got: %s", expected, out.String())
 	}
 }
 
@@ -43,12 +57,12 @@ func TestCombination(t *testing.T) {
 		}
 	}
 
-	got := Combination(2)
+	got := sudoku.Combination(2)
 	assert([][]int{
 		[]int{0, 1},
 	}, got)
 
-	got = Combination(4)
+	got = sudoku.Combination(4)
 	assert([][]int{
 		[]int{0, 1},
 		[]int{0, 2},
@@ -62,6 +76,6 @@ func TestCombination(t *testing.T) {
 func BenchmarkCombination(b *testing.B) {
 	N := 9
 	for i := 0; i < b.N; i++ {
-		Combination(N)
+		sudoku.Combination(N)
 	}
 }

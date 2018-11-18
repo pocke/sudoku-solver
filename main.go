@@ -1,15 +1,13 @@
-package main
+package sudoku
 
 import (
 	"bufio"
-	"fmt"
 	"io"
 	"math"
 	"math/rand"
-	"os"
 	"strconv"
-	"time"
 
+	"github.com/pkg/errors"
 	"github.com/pocke/go-minisat"
 )
 
@@ -18,13 +16,7 @@ const (
 	Unfilled = -1
 )
 
-func main() {
-	rand.Seed(time.Now().UnixNano())
-	os.Exit(Solve(os.Stdin, os.Stdout))
-}
-
-func Solve(in io.Reader, out io.Writer) int {
-
+func Solve(board [][]int) ([][]int, error) {
 	s := minisat.NewSolver(rand.Float64())
 	vars := make([][][]*minisat.Var, 0, N)
 	for i := 0; i < N; i++ {
@@ -81,8 +73,6 @@ func Solve(in io.Reader, out io.Writer) int {
 		}
 	}
 
-	// scan
-	board := LoadBoard(in)
 	for i, row := range board {
 		for j, v := range row {
 			if v != Unfilled {
@@ -93,26 +83,25 @@ func Solve(in io.Reader, out io.Writer) int {
 
 	res := s.Solve()
 	if !res {
-		fmt.Fprintln(out, "Unsat")
-		return 1
+		return nil, errors.New("Unsatisfy it.")
 	}
 
-	o := make([]byte, 0, (N+1)*N)
+	result := make([][]int, N)
 	for i := 0; i < N; i++ {
+		result[i] = make([]int, N)
 		for j := 0; j < N; j++ {
 			for k := 0; k < N; k++ {
 				v := vars[i][j][k]
 				b, _ := s.ModelValue(v)
 				if b {
-					o = strconv.AppendInt(o, int64(k+1), 10)
+					result[i][j] = k
 					break
 				}
 			}
 		}
-		o = append(o, '\n')
 	}
-	out.Write(o)
-	return 0
+
+	return result, nil
 }
 
 func LoadBoard(in io.Reader) [][]int {
